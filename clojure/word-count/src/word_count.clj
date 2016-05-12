@@ -1,8 +1,7 @@
-(ns word-count)
+(ns word-count
+  (:require [clojure.string :as str]))
 
-(defn word-collection
-  ([thash hword]
-   ()))
+(defn sub-ocurrences-in-string ([string sub] (count (re-seq (re-pattern (str "\\b" sub "\\b")) string))))
 
 ;; A B C C C D A B
 ;; -- {A 1}
@@ -15,5 +14,7 @@
 ;; -- {A 2 B 2 C 3 D 1}
 
 (defn word-count
-  (let [tHash {}]
-    ([text] (map  (re-seq #"\w+" text)))))
+  ([text]
+   (defn sub-counter [sub] (sub-ocurrences-in-string (str/lower-case text) (str/lower-case sub)))
+   (let [word-list (re-seq #"\w+" (str/lower-case text)) words-map {}]
+     (apply merge (map (fn [word] (update words-map word (fn [old-word] (sub-counter word)))) word-list)))))
